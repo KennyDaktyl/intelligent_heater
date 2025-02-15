@@ -22,7 +22,7 @@ def main():
             now = get_current_time()  # Pobieramy aktualny czas (zawiera strefę czasową)
 
             # 📬 **Sprawdzenie, czy jest po 22:00 i czy e-mail został już wysłany dziś**
-            if now.hour >= 14 and (last_email_sent_date is None or last_email_sent_date < now.date()):
+            if now.hour >= 22 and (last_email_sent_date is None or last_email_sent_date < now.date()):
                 logging.info("📩 Wysyłam logi i zestawienie czasu pracy urządzenia.")
                 send_email_with_logs([])  # Można dodać obsługę czasu pracy
                 last_email_sent_date = now.date()  # Zapisujemy datę wysłania e-maila

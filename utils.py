@@ -26,9 +26,12 @@ def setup_logging():
     os.makedirs(LOG_DIR, exist_ok=True)
     log_file = os.path.join(LOG_DIR, f"log_{log_date}.log")
 
-    handler = logging.FileHandler(log_file)
+    file_handler = logging.FileHandler(log_file)
+    console_handler = logging.StreamHandler()
+
     formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
-    handler.setFormatter(formatter)
+    file_handler.setFormatter(formatter)
+    console_handler.setFormatter(formatter)
 
     root_logger = logging.getLogger()
     root_logger.setLevel(logging.INFO)
@@ -36,7 +39,8 @@ def setup_logging():
     if root_logger.hasHandlers():
         root_logger.handlers.clear()
 
-    root_logger.addHandler(handler)
+    root_logger.addHandler(file_handler)
+    root_logger.addHandler(console_handler)
     logging.info(f"Logowanie skonfigurowane na plik: {log_file}")
 
 
