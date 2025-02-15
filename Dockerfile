@@ -3,10 +3,15 @@ FROM python:3.12-slim
 WORKDIR /app
 
 ENV TZ=Europe/Warsaw
-RUN apk add --no-cache tzdata && \
+RUN apt update && apt install -y tzdata && \
     ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
-RUN apt update && apt install -y gcc libffi-dev libpq-dev python3-dev
+RUN apt update && apt install -y --no-install-recommends \
+    gcc \
+    libffi-dev \
+    libpq-dev \
+    python3-dev \
+    && rm -rf /var/lib/apt/lists/*
 
 COPY . .
 
