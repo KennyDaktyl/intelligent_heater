@@ -21,16 +21,7 @@ def main():
             if now.hour >= 22 and (last_email_sent_date is None or last_email_sent_date < now.date()): # noqa
                 logging.info("📩 Wysyłam logi i zestawienie czasu pracy urządzenia.") # noqa
 
-                if work_sessions:
-                    summary = "\n".join(
-                        [f"Włączona od {start.strftime('%H:%M')} do {end.strftime('%H:%M')}" # noqa  
-                         for start, end in work_sessions if end]
-                    )
-                else:
-                    summary = "Brak zapisanych okresów pracy urządzenia."
-
-                email_body = f"Zestawienie czasowe pracy grzałki:\n{summary}"
-                send_email_with_logs(email_body)
+                send_email_with_logs(work_sessions)
 
                 last_email_sent_date = now.date()
                 work_sessions.clear()
