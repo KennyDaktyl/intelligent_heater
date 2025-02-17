@@ -1,22 +1,33 @@
 import os
 import logging
+import smtplib
 import pytz
+import time
 
 from datetime import datetime
 from config import LOG_DIR
 
 from email.message import EmailMessage
-import smtplib
 
 current_log_date = None  
 warsaw_tz = pytz.timezone("Europe/Warsaw")
 
 
+class WarsawTimeFormatter(logging.Formatter):
+    """Formatter, który wymusza czas w Europe/Warsaw bez milisekund."""
+    def formatTime(self, record, datefmt=None):
+        dt = datetime.fromtimestamp(record.created, tz=warsaw_tz)
+        return dt.strftime(datefmt or "%Y-%m-%d %H:%M:%S")
+
 def setup_logging():
     """Konfiguracja logowania - przełączanie logów tylko raz na dobę."""
     global current_log_date
 
-    now = datetime.now()
+    # 🔧 Ustawienie strefy czasowej systemu
+    os.environ["TZ"] = "Europe/Warsaw"
+    time.tzset()
+
+    now = datetime.now(warsaw_tz)  # Pobierz czas w Warszawie
     log_date = now.strftime('%Y-%m-%d')
 
     if log_date == current_log_date:
@@ -29,7 +40,12 @@ def setup_logging():
     file_handler = logging.FileHandler(log_file)
     console_handler = logging.StreamHandler()
 
-    formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
+    # 📌 Użycie niestandardowego formatowania czasu (bez milisekund!)
+    formatter = WarsawTimeFormatter("%(asctime)s - %(levelname)s - %(message)s")
+
+    file_handler.setLevel(logging.INFO)
+    console_handler.setLevel(logging.INFO)
+
     file_handler.setFormatter(formatter)
     console_handler.setFormatter(formatter)
 

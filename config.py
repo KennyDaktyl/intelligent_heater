@@ -12,5 +12,5 @@ DB_CONFIG = {
 LOG_DIR = "logs"
 
 GPIO_PIN = 17  # Numer pinu GPIO do włączania urządzenia
-CHECK_INTERVAL = 180  # Czas oczekiwania w sekundach (3 minuty)
+CHECK_INTERVAL = 60  # Czas oczekiwania w sekundach (3 minuty)
 POWER_THRESHOLD = 2.5  # Próg mocy w kW

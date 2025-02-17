@@ -34,8 +34,7 @@ def main():
 
                 # ✅ KONWERSJA TIMESTAMPU (jeśli jest bez strefy czasowej)
                 if timestamp.tzinfo is None:
-                    timestamp = timestamp.replace(tzinfo=pytz.utc)  # Ustawienie jako UTC
-                timestamp = timestamp.astimezone(warsaw_tz)  # Konwersja do Warszawy
+                    timestamp = warsaw_tz.localize(timestamp)  # Poprawnie lokalizujemy czas
 
                 now = get_current_time()  # Aktualizujemy czas po konwersji
                 age_seconds = (now - timestamp).total_seconds()  # Teraz oba czasy są `aware`
@@ -43,7 +42,7 @@ def main():
                 # Sprawdzanie przestarzałych danych
                 if power is None:
                     if device_state:  # Jeśli urządzenie było włączone, loguj i wyłącz
-                        logging.error(f"⚠️ AWARIA: Brak wartości `current_power`. Ostatni wpis: {timestamp}. WYŁĄCZANIE urządzenia.")
+                        logging.error(f"⚠️ AWARIA: Brak wartości `current_power`. Ostatni wpis: {timestamp.strftime('%Y-%m-%d %H:%M:%S')}). WYŁĄCZANIE urządzenia.")
                         turn_off()
                         device_state = False
                     time.sleep(CHECK_INTERVAL)
@@ -51,14 +50,14 @@ def main():
 
                 if age_seconds > 181:
                     if device_state:
-                        logging.error(f"⚠️ AWARIA: Przestarzały wpis ({timestamp}, {age_seconds:.0f} sekund temu). WYŁĄCZANIE urządzenia.")
+                        logging.error(f"⚠️ AWARIA: Przestarzały wpis ({timestamp.strftime('%Y-%m-%d %H:%M:%S')}), {age_seconds:.0f} sekund temu). WYŁĄCZANIE urządzenia.")
                         turn_off()
                         device_state = False
                     time.sleep(CHECK_INTERVAL)
                     continue
 
                 # Logowanie wartości mocy
-                logging.info(f"🔍 Odczytana moc: {power} kW (timestamp: {timestamp})")
+                logging.info(f"🔍 Odczytana moc: {power} kW (timestamp: {timestamp.strftime('%Y-%m-%d %H:%M:%S')}))")
 
                 # Decyzja o zmianie stanu urządzenia
                 if power > POWER_THRESHOLD and not device_state:
