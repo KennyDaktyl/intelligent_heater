@@ -19,45 +19,42 @@ class WarsawTimeFormatter(logging.Formatter):
         dt = datetime.fromtimestamp(record.created, tz=warsaw_tz)
         return dt.strftime(datefmt or "%Y-%m-%d %H:%M:%S")
 
+
 def setup_logging():
     """Konfiguracja logowania - przełączanie logów tylko raz na dobę."""
     global current_log_date
 
-    # 🔧 Ustawienie strefy czasowej systemu
     os.environ["TZ"] = "Europe/Warsaw"
     time.tzset()
 
-    now = datetime.now(warsaw_tz)  # Pobierz czas w Warszawie
+    now = datetime.now(warsaw_tz)
     log_date = now.strftime('%Y-%m-%d')
 
-    if log_date == current_log_date:
-        return  
+    if current_log_date is None or log_date != current_log_date:
+        current_log_date = log_date
+        os.makedirs(LOG_DIR, exist_ok=True)
+        log_file = os.path.join(LOG_DIR, f"log_{log_date}.log")
 
-    current_log_date = log_date
-    os.makedirs(LOG_DIR, exist_ok=True)
-    log_file = os.path.join(LOG_DIR, f"log_{log_date}.log")
+        file_handler = logging.FileHandler(log_file)
+        console_handler = logging.StreamHandler()
 
-    file_handler = logging.FileHandler(log_file)
-    console_handler = logging.StreamHandler()
+        formatter = WarsawTimeFormatter("%(asctime)s - %(levelname)s - %(message)s")
 
-    # 📌 Użycie niestandardowego formatowania czasu (bez milisekund!)
-    formatter = WarsawTimeFormatter("%(asctime)s - %(levelname)s - %(message)s")
+        file_handler.setLevel(logging.INFO)
+        console_handler.setLevel(logging.INFO)
 
-    file_handler.setLevel(logging.INFO)
-    console_handler.setLevel(logging.INFO)
+        file_handler.setFormatter(formatter)
+        console_handler.setFormatter(formatter)
 
-    file_handler.setFormatter(formatter)
-    console_handler.setFormatter(formatter)
+        root_logger = logging.getLogger()
+        root_logger.setLevel(logging.INFO)
 
-    root_logger = logging.getLogger()
-    root_logger.setLevel(logging.INFO)
+        if root_logger.hasHandlers():
+            root_logger.handlers.clear()
 
-    if root_logger.hasHandlers():
-        root_logger.handlers.clear()
-
-    root_logger.addHandler(file_handler)
-    root_logger.addHandler(console_handler)
-    logging.info(f"Logowanie skonfigurowane na plik: {log_file}")
+        root_logger.addHandler(file_handler)
+        root_logger.addHandler(console_handler)
+        logging.info(f"Logowanie skonfigurowane na plik: {log_file}")
 
 
 def send_email_with_logs(operation_times):

@@ -8,7 +8,6 @@ from utils import setup_logging, send_email_with_logs, get_current_time, warsaw_
 
 def main():
     setup_gpio()
-    setup_logging()
 
     device_state = False
     last_email_sent_date = None
@@ -16,6 +15,7 @@ def main():
 
     try:
         while True:
+            setup_logging()
             now = get_current_time()
 
             if now.hour >= 22 and (last_email_sent_date is None or last_email_sent_date < now.date()): # noqa
