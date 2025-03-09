@@ -46,7 +46,7 @@ def main():
                         device_state = False
 
                         if work_sessions and work_sessions[-1][1] is None:
-                            work_sessions[-1][1] = now
+                            work_sessions[-1][1] = now.strftime('%H:%M')
 
                     time.sleep(CHECK_INTERVAL)
                     continue
@@ -60,7 +60,7 @@ def main():
                         device_state = False
 
                         if work_sessions and work_sessions[-1][1] is None:
-                            work_sessions[-1][1] = now
+                            work_sessions[-1][1] = now.strftime('%H:%M')
 
                     time.sleep(CHECK_INTERVAL)
                     continue
@@ -73,7 +73,7 @@ def main():
                     logging.info("Moc przekracza próg - WŁĄCZANIE urządzenia.")
                     turn_on()
                     device_state = True
-                    work_sessions.append([timestamp, None])
+                    work_sessions.append([timestamp.strftime('%H:%M'), None])
 
                 elif power <= POWER_THRESHOLD and device_state:
                     logging.info(
@@ -82,7 +82,7 @@ def main():
                     turn_off()
                     device_state = False
                     if work_sessions and work_sessions[-1][1] is None:
-                        work_sessions[-1][1] = timestamp
+                        work_sessions[-1][1] = timestamp.strftime('%H:%M')
 
             else:
                 if device_state:
@@ -93,7 +93,7 @@ def main():
                     device_state = False
 
                     if work_sessions and work_sessions[-1][1] is None:
-                        work_sessions[-1][1] = now
+                        work_sessions[-1][1] = now.strftime('%H:%M')
 
             time.sleep(CHECK_INTERVAL)
 
